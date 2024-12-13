@@ -1,0 +1,9 @@
+**/*.o
+objects
+
+akin_run
+
+*.svg
+*.txt
+*.html
+*.dot
