@@ -36,11 +36,14 @@ errors_t DrawTree(Tree_t *tree, FILE *dot_file)
 
     fprintf(dot_file, "digraph\n{\n");
 
-    fprintf(dot_file, "\trandir=\"TB\";\n\tnodesep=0.5;\n\tranksep=0.8;\n");
+    fprintf(dot_file, "\trandir=\"TB\";\n\tnodesep=1;\n\tranksep=1.2;\n");
 
     fprintf(dot_file, "\tsubgraph cluster_tree\n\t{\n");
-    fprintf(dot_file, "\t\tnode[shape=\"septagon\", height=0.7];\n");
-    //fprintf(dot_file, "edge[")
+    fprintf(dot_file, "\tbgcolor=\"palegreen4:gray15\";\n\tstyle=radial;\n\tgradientangle=0;\n");
+    fprintf(dot_file, "\t\tnode[shape=\"doubleoctagon\", height=0.7, color=palegreen4, fontcolor=\"#3f2512\","
+            "style=filled, fillcolor=\"palegreen3:palegreen4\", style=radial, gradientangle=0, "
+            "fontname=\"Special Elite\"];\n");
+    fprintf(dot_file, "\n\nedge[color=\"#170d07, style=bold\"];\n");
     //printf("%p\n", tree->root);
     CHECK_ER(DrawNode(tree->root, dot_file));
 
@@ -57,14 +60,18 @@ errors_t DrawNode(Node_t *node, FILE *dot_file)
     static int depth = 1;
     depth++;
 
-    fprintf(dot_file, "\t\t\"%s\";\n", node->data);
+    if (node->left || node->right)
+        fprintf(dot_file, "\t\t\"%s\";\n", node->data);
+    else
+        fprintf(dot_file, "\t\t\"%s\"[shape=Mdiamond, style=filled, fillcolor=\"red\","
+                "style=radial, gradientangle=270];\n", node->data);
     if (node->parent)
     {
         if (node == node->parent->left)
-            fprintf(dot_file, "\t\t\"%s\":sw -> \"%s\"[label=\"Нет\", weight=%d];\n", node->parent->data,
+            fprintf(dot_file, "\t\t\"%s\" -> \"%s\"[label=\"Нет\", weight=%d];\n", node->parent->data,
                     node->data, depth);
         else
-            fprintf(dot_file, "\t\t\"%s\":se -> \"%s\"[label=\"Да\", weight=%d];\n", node->parent->data,
+            fprintf(dot_file, "\t\t\"%s\" -> \"%s\"[label=\"Да\", weight=%d];\n", node->parent->data,
                     node->data, depth);
     }
 

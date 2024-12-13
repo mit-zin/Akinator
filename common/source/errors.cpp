@@ -4,7 +4,8 @@
 
 void PrintErr(unsigned int res)
 {
-    printf("Errors:\n");
+    if (res)
+        printf("Errors:\n");
     if (res & NULL_PTR)
         printf("Null pointer.\n");
     if (res & UNKNOWN_ERROR)
