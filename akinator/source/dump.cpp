@@ -42,8 +42,9 @@ errors_t DrawTree(Tree_t *tree, FILE *dot_file)
     fprintf(dot_file, "\tbgcolor=\"palegreen4:gray15\";\n\tstyle=radial;\n\tgradientangle=0;\n");
     fprintf(dot_file, "\t\tnode[shape=\"doubleoctagon\", height=0.7, color=palegreen4, fontcolor=\"#3f2512\","
             "style=filled, fillcolor=\"palegreen3:palegreen4\", style=radial, gradientangle=0, "
-            "fontname=\"Special Elite\"];\n");
-    fprintf(dot_file, "\n\nedge[color=\"#170d07, style=bold\"];\n");
+            "fontname=\"CMU Typewriter Text\", fontsize=17];\n");
+    fprintf(dot_file, "\n\nedge[color=\"#170d07\", style=bold, fontname=\"CMU Typewriter Text\", "
+            "arrowsize=1.5, fontsize=18];\n");
     //printf("%p\n", tree->root);
     CHECK_ER(DrawNode(tree->root, dot_file));
 
@@ -54,7 +55,7 @@ errors_t DrawTree(Tree_t *tree, FILE *dot_file)
 
 errors_t DrawNode(Node_t *node, FILE *dot_file)
 {
-    MY_ASSERT(node, "Null ponter given as argument.", return NULL_PTR);
+    MY_ASSERT(node, "Null pointer given as argument.", return NULL_PTR);
     MY_ASSERT(dot_file, "Null pointer given as argument.", return NULL_PTR);
 
     static int depth = 1;
@@ -63,16 +64,16 @@ errors_t DrawNode(Node_t *node, FILE *dot_file)
     if (node->left || node->right)
         fprintf(dot_file, "\t\t\"%s\";\n", node->data);
     else
-        fprintf(dot_file, "\t\t\"%s\"[shape=Mdiamond, style=filled, fillcolor=\"red\","
-                "style=radial, gradientangle=270];\n", node->data);
+        fprintf(dot_file, "\t\t\"%s\"[shape=invhouse, style=filled, fillcolor=\"brown1:brown4\","
+                "style=radial, gradientangle=90, color=\"brown4\"];\n", node->data);
     if (node->parent)
     {
         if (node == node->parent->left)
-            fprintf(dot_file, "\t\t\"%s\" -> \"%s\"[label=\"Нет\", weight=%d];\n", node->parent->data,
-                    node->data, depth);
+            fprintf(dot_file, "\t\t\"%s\" -> \"%s\"[label=\"Нет\", weight=%d, arrowhead=\"ricurvelicurve\"];\n",
+                    node->parent->data, node->data, depth);
         else
-            fprintf(dot_file, "\t\t\"%s\" -> \"%s\"[label=\"Да\", weight=%d];\n", node->parent->data,
-                    node->data, depth);
+            fprintf(dot_file, "\t\t\"%s\" -> \"%s\"[label=\"Да\", weight=%d, arrowhead=\"licurvericurve\"];\n",
+                    node->parent->data, node->data, depth);
     }
 
     if (node->left)

@@ -34,16 +34,11 @@ enum choice_t
     ANS_4
 };
 
-//errors_t Suggest(Tree_t *tree);
-
 errors_t  Definition(Tree_t *tree);
 rec_res_t PrintDef(Node_t *node, const char *word);
 
 errors_t CompareCharacters(Tree_t *tree);
 print_cmp_res_t PrintCmp(Node_t *node, const char *word1, const char *word2);
-
-errors_t GetWord(char *word, int max_size);
-const int SCAN_STRING_LEN = 30;
 
 errors_t AddAnswer(Node_t *node);
 

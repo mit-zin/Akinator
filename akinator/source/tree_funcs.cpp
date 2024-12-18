@@ -23,8 +23,6 @@ errors_t CreateTree(Tree_t *tree)
 
 Node_t *CreateNode(Node_t *left, Node_t *right, Node_t *parent)
 {
-    //MY_ASSERT(node, "Null pointer given as argument.", exit(EXIT_FAILURE));
-
     Node_t *node = (Node_t *) calloc(1, sizeof(Node_t));
     if (!node)
         return NULL;
@@ -85,7 +83,7 @@ errors_t WriteNode(Node_t *node, FILE *base_file)
     for (int i = 0; i < depth + 1; i++)
         fputc('\t', base_file);
 
-    fprintf(base_file, "\"%s\"\n", node->data);
+    fprintf(base_file, "%s\n", node->data);
 
     depth++;
 
@@ -109,7 +107,7 @@ errors_t WriteBase(Tree_t *tree)
 {
     MY_ASSERT(tree, "Null pointer given as argument.", return NULL_PTR);
 
-    FILE *base_file = fopen("base.txt", "wb");
+    FILE *base_file = fopen(BASE_FILE_NAME, "wb");
     if (!base_file)
         return FILE_NULL_PTR;
 
@@ -124,13 +122,15 @@ errors_t ReadBase(Tree_t *tree)
 {
     MY_ASSERT(tree, "Null pointer given as argument.", return NULL_PTR);
 
-    FILE *base_file = fopen("base.txt", "rb");
+    FILE *base_file = fopen(BASE_FILE_NAME, "rb");
     if (!base_file)
         return FILE_NULL_PTR;
 
     tree->root = CreateNode(NULL, NULL, NULL);
 
-    fscanf(base_file, "{ \"%100[^\"]\"", tree->root->data);
+    fgetc(base_file);
+    CHECK_ER(fGetWord(tree->root->data, DATA_SIZE, base_file));
+
     Node_t *node = tree->root;
 
     while (fscanf(base_file, "%*[^{}]") != EOF)
@@ -141,34 +141,23 @@ errors_t ReadBase(Tree_t *tree)
         {
             CHECK_ER(DUMP_TREE(tree));
 
-            char *string = (char *) calloc(DATA_SIZE, sizeof(char));
-            if (!string)
-                return NULL_PTR;
-            fscanf(base_file, " \"%100[^\"]\" ", string);
-
             if (!node->left)
             {
-                node->left = CreateNode(NULL, NULL, node);//TODO rename
+                node->left = CreateNode(NULL, NULL, node);
 
-                memcpy(node->left->data, string, DATA_SIZE);
+                CHECK_ER(fGetWord(node->left->data, DATA_SIZE, base_file));
                 node = node->left;
             }
             else
             {
                 node->right = CreateNode(NULL, NULL, node);
 
-                memcpy(node->right->data, string, DATA_SIZE);
+                CHECK_ER(fGetWord(node->right->data, DATA_SIZE, base_file));
                 node = node->right;
             }
-
-            free(string);
         }
         else
         {
-            /*printf("%p ", node);
-            printf("%p ", node->parent);
-            printf("%p ", node->left);
-            printf("%p\n", node->right);*/
             if (node == tree->root)
                 break;
             node = node->parent;
@@ -180,3 +169,14 @@ errors_t ReadBase(Tree_t *tree)
     return SUCCESS;
 }
 
+errors_t fGetWord(char *word, int max_size, FILE *stream)
+{
+    MY_ASSERT(word, "Null pointer given as argument.", return NULL_PTR);
+
+    char scan_string[SCAN_STRING_LEN] = {};
+    sprintf(scan_string, "%%*[ \t\n\r]%%%d[^\n]", max_size - 1);
+
+    FSCAN_COL(ORNG, stream, scan_string, word);
+
+    return SUCCESS;
+}

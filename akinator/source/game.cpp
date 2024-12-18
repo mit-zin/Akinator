@@ -4,17 +4,6 @@
 
 #include "../include/game.h"
 
-/*errors_t PlayGame(Tree_t *tree)
-{
-    MY_ASSERT(tree, "Null pointer given as argument.", return NULL_PTR);
-
-    CHECK_ER(Suggest(tree));
-
-    DUMP_TREE(tree);
-
-    return SUCCESS;
-}*/
-
 errors_t PlayGame(Tree_t *tree)
 {
     MY_ASSERT(tree, "Null pointer given as argument.", return NULL_PTR);
@@ -69,23 +58,21 @@ errors_t Ask(Node_t *node)
 {
     MY_ASSERT(node, "Null pointer given as argument.", return NULL_PTR);
 
-
     if (!node->left && !node->right)
     {
         PRINT_COL(PALE_GRN, "\nЭто %s! Угадал?\n\n", node->data);
 
         char input[INP_LEN] = {};
-        while (getchar() != '\n');
-        SCAN_COL(ORNG, "%100[^\n]", input);
 
-        while (strcmp(input, "yes") && strcmp(input, "no"))
+        CHECK_ER(GET_WORD(input, INP_LEN));
+
+        while (strcmp(input, "да") && strcmp(input, "нет"))
         {
-            while (getchar() != '\n');
             PRINT_COL(PALE_GRN, "\nПрости, не понимаю тебя.\n\n");
-            SCAN_COL(ORNG, "%100[^\n]", input);
+            CHECK_ER(GET_WORD(input, INP_LEN));
         }
 
-        if (strcmp("yes", input))
+        if (strcmp("да", input))
             CHECK_ER(AddAnswer(node));
         else
             PRINT_COL(PALE_GRN, "\nЭто было легче лёгкого └(^▼^)┘\n\n");
@@ -96,16 +83,16 @@ errors_t Ask(Node_t *node)
     PRINT_COL(PALE_GRN, "\nЭто %s?\n\n", node->data);
 
     char input[INP_LEN] = {};
-    while (getchar() != '\n');
-    SCAN_COL(ORNG, "%100[^\n]", input);
-    while (strcmp(input, "yes") && strcmp(input, "no"))
+
+    CHECK_ER(GET_WORD(input, INP_LEN));
+    while (strcmp(input, "да") && strcmp(input, "нет"))
     {
         PRINT_COL(PALE_GRN, "\nПрости, не понимаю тебя.\n\n");
-        while (getchar() != '\n');
-        SCAN_COL(ORNG, "%100[^\n]", input);
+
+        CHECK_ER(GET_WORD(input, INP_LEN));
     }
 
-    if (!strcmp(input, "yes"))
+    if (!strcmp(input, "да"))
         CHECK_ER(Ask(node->right));
     else
         CHECK_ER(Ask(node->left));
@@ -126,11 +113,11 @@ errors_t AddAnswer(Node_t *node)
 
     node = node->parent;
     node->right->parent = node;
-    CHECK_ER(GetWord(node->right->data, DATA_SIZE));
+    CHECK_ER(GET_WORD(node->right->data, DATA_SIZE));
 
     PRINT_COL(PALE_GRN, "\nЧем %s отличается от %s?\n\n", node->right->data, node->left->data);
 
-    CHECK_ER(GetWord(node->data, DATA_SIZE));
+    CHECK_ER(GET_WORD(node->data, DATA_SIZE));
 
     PRINT_COL(PALE_GRN, "\nОк, я запомнил.\n\n");
 
@@ -146,13 +133,13 @@ errors_t Definition(Tree_t *tree)
     if (!word)
         return NULL_PTR;
 
-    CHECK_ER(GetWord(word, DATA_SIZE));
+    CHECK_ER(GET_WORD(word, DATA_SIZE));
 
     while (!PrintDef(tree->root, word))
     {
         PRINT_COL(PALE_GRN, "\nЯ не знаю, что это :(\n\n");
 
-        CHECK_ER(GetWord(word, DATA_SIZE));
+        CHECK_ER(GET_WORD(word, DATA_SIZE));
     }
 
     printf("\n\n");
@@ -199,15 +186,15 @@ errors_t CompareCharacters(Tree_t *tree)
     if (!word2 || !word1)
         return NULL_PTR;
 
-    CHECK_ER(GetWord(word1, DATA_SIZE));
-    CHECK_ER(GetWord(word2, DATA_SIZE));
+    CHECK_ER(GET_WORD(word1, DATA_SIZE));
+    CHECK_ER(GET_WORD(word2, DATA_SIZE));
 
     while (PrintCmp(tree->root, word1, word2) != BOTH_FOUND)
     {
         PRINT_COL(PALE_GRN, "\nЯ не всё из этого знаю :(\n\n");
 
-        CHECK_ER(GetWord(word1, DATA_SIZE));
-        CHECK_ER(GetWord(word2, DATA_SIZE));
+        CHECK_ER(GET_WORD(word1, DATA_SIZE));
+        CHECK_ER(GET_WORD(word2, DATA_SIZE));
     }
     printf("\n\n");
 
@@ -271,14 +258,4 @@ print_cmp_res_t PrintCmp(Node_t *node, const char *word1, const char *word2)
     return NOTHING_FOUND;
 }
 
-errors_t GetWord(char *word, int max_size)
-{
-    MY_ASSERT(word, "Null pointer given as argument.", return NULL_PTR);
 
-    char scan_string[SCAN_STRING_LEN] = {};
-    sprintf(scan_string, "%%*[ \t\n\r]%%%d[^\n]", max_size - 1);
-
-    SCAN_COL(ORNG, scan_string, word);
-
-    return SUCCESS;
-}
